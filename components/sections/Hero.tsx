@@ -2,8 +2,6 @@
 
 import { useRef, useState, useEffect } from "react";
 import gsap from "gsap";
-import { useGSAP } from "@react-three/fiber"; // checking if this was the correct one or @gsap/react
-// I will use @gsap/react as it's the standard for Next.js projects usually
 import { useGSAP as useGsapReact } from "@gsap/react";
 import { CV_DATA } from "@/data/cv";
 
@@ -31,7 +29,8 @@ export default function Hero() {
   const nameRef = useRef<HTMLHeadingElement>(null);
 
   useGsapReact(() => {
-    const tl = gsap.timeline();
+    // Add a slight delay to ensure preloader is fading out
+    const tl = gsap.timeline({ delay: 0.8 });
     
     const scrambleText = (el: HTMLElement, finalResult: string) => {
       const chars = "!<>-_\\/[]{}—=+*^?#________";
@@ -59,7 +58,8 @@ export default function Hero() {
       onStart: () => {
         if (nameRef.current) {
           const first = CV_DATA.name.split(" ")[0];
-          scrambleText(nameRef.current.querySelector(".name-first")!, first);
+          const firstEl = nameRef.current.querySelector(".name-first") as HTMLElement;
+          if (firstEl) scrambleText(firstEl, first);
         }
       }
     });
@@ -83,38 +83,40 @@ export default function Hero() {
     <section 
       ref={containerRef}
       id="hero"
-      className="relative min-h-screen flex flex-col md:flex-row items-center justify-center gap-4 md:gap-12 px-6 py-12 md:py-24 overflow-hidden"
+      className="relative min-h-[100dvh] flex flex-col md:flex-row items-center justify-center gap-6 md:gap-12 px-6 py-12 md:py-0 overflow-hidden"
     >
       {/* Decorative Cyber Grid Background Element */}
-      <div className="absolute top-1/2 left-0 w-full h-px bg-white/5 cyber-line origin-left" />
+      <div className="absolute top-1/2 left-0 w-full h-px bg-white/5 cyber-line origin-left hidden md:block" />
       
-      <div className="w-full md:w-1/2 h-[250px] sm:h-[300px] md:h-[600px] flex items-center justify-center pointer-events-none">
-        <div className="w-full h-full" />
+      {/* Image Spacer (for 3D Frame) */}
+      <div className="w-full md:w-1/2 h-[280px] sm:h-[350px] md:h-screen flex items-center justify-center pointer-events-none relative z-10 shrink-0">
+        <div className="w-full h-full max-w-[500px] border border-white/5 rounded-lg opacity-0" />
       </div>
 
-      <div className="w-full md:w-1/2 text-center md:text-left z-20 pb-8 md:pb-0 relative">
+      {/* Content */}
+      <div className="w-full md:w-1/2 text-center md:text-left z-20 relative flex flex-col justify-center">
         {/* Tech Decor */}
-        <div className="absolute -top-12 -left-8 hidden lg:block">
+        <div className="absolute -top-16 -left-8 hidden lg:block">
           <DataReadout />
           <div className="w-px h-12 bg-gradient-to-b from-cyan-500/50 to-transparent mt-2 ml-0.5" />
         </div>
 
-        <div className="relative inline-block px-4 py-2 mb-6">
+        <div className="relative inline-block px-4 py-2 mb-4 md:mb-6 self-center md:self-start">
           <div className="absolute top-0 left-0 w-2 h-2 border-t border-l border-cyan-500/50" />
           <div className="absolute bottom-0 right-0 w-2 h-2 border-b border-r border-cyan-500/50" />
-          <h2 className="reveal-text text-gray-500 text-[8px] md:text-[10px] font-mono tracking-[0.3em] md:tracking-[0.5em] uppercase">
+          <h2 className="reveal-text text-gray-500 text-[9px] md:text-[10px] font-mono tracking-[0.3em] md:tracking-[0.5em] uppercase">
             Full Stack Engineer & Cloud Practitioner // 01
           </h2>
         </div>
 
-        <h1 ref={nameRef} className="reveal-text text-white text-5xl sm:text-6xl md:text-8xl lg:text-9xl font-bold mb-6 md:mb-8 leading-[0.9] tracking-tighter">
+        <h1 ref={nameRef} className="reveal-text text-white text-5xl sm:text-6xl lg:text-8xl xl:text-9xl font-bold mb-4 md:mb-8 leading-[1.1] md:leading-[0.9] tracking-tighter">
           <span className="name-first">{CV_DATA.name.split(" ")[0]}</span> <br />
           <span className="text-white/20 italic font-light">
             {CV_DATA.name.split(" ").slice(1).join(" ")}
           </span>
         </h1>
         
-        <p className="reveal-text text-gray-400 text-sm md:text-xl max-w-lg mb-8 md:mb-12 leading-relaxed font-light tracking-tight border-l border-white/5 pl-6 mx-auto md:mx-0">
+        <p className="reveal-text text-gray-400 text-sm md:text-xl max-w-lg mb-8 md:mb-12 leading-relaxed font-light tracking-tight border-l-2 md:border-l border-white/10 pl-6 mx-auto md:mx-0">
           {CV_DATA.about}
         </p>
         

@@ -29,8 +29,8 @@ body {
   position: relative;
 }
 
-/* Technical Grid Background Effect */
-body::before {
+/* Technical Grid Background Effect Removed */
+/* body::before {
   content: "";
   position: fixed;
   inset: 0;
@@ -40,7 +40,7 @@ body::before {
   background-size: 40px 40px;
   pointer-events: none;
   z-index: -5;
-}
+} */
 
 /* Custom Selection Color */
 ::selection {

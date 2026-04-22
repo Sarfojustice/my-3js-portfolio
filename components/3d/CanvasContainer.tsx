@@ -86,11 +86,11 @@ function ResponsiveFrame() {
   const isMobile = viewport.width < 10;
   
   const initialPosition: [number, number, number] = useMemo(() => {
-    if (isMobile) return [0, 0.4, 0];
+    if (isMobile) return [0, 1.2, 0];
     return [-viewport.width / 4, -1.2, 0];
   }, [isMobile, viewport.width]);
 
-  const initialScale = isMobile ? 0.55 : 1;
+  const initialScale = isMobile ? 0.6 : 1;
 
   useGSAP(() => {
     if (!groupRef.current) return;
@@ -111,11 +111,11 @@ function ResponsiveFrame() {
     });
 
     tl.to(groupRef.current.position, {
-      y: initialPosition[1] + 5,
-      z: -8,
+      y: isMobile ? initialPosition[1] + 2 : initialPosition[1] + 5,
+      z: isMobile ? -2 : -8,
       ease: "none"
     });
-  }, [initialPosition]);
+  }, [initialPosition, isMobile]);
 
   return (
     <group 
@@ -143,7 +143,7 @@ export default function CanvasContainer() {
           <ResponsiveFrame />
           <Environment preset="city" />
           
-          <EffectComposer disableNormalPass>
+          <EffectComposer enableNormalPass={false}>
             <Bloom 
               intensity={0.4} 
               luminanceThreshold={0.2} 
