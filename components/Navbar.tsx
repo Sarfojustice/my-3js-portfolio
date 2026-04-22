@@ -3,7 +3,6 @@
 import { useState, useEffect } from "react";
 import { CV_DATA } from "@/data/cv";
 import { Menu, X } from "lucide-react";
-import ThemeToggle from "./ThemeToggle";
 
 export default function Navbar() {
   const [isScrolled, setIsScrolled] = useState(false);
@@ -69,8 +68,6 @@ export default function Navbar() {
         </div>
 
         <div className="flex items-center gap-8">
-          <ThemeToggle />
-
           <div className="hidden xl:flex flex-col items-end">
             <div className="text-[8px] font-mono text-accent/60 uppercase leading-none mb-1">Local_Time</div>
             <div className="text-xs font-mono text-foreground leading-none tracking-widest">{time || "00:00:00"}</div>

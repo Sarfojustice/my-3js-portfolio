@@ -3,7 +3,6 @@ import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import TechHUD from "@/components/TechHUD";
 import Preloader from "@/components/Preloader";
-import { ThemeProvider } from "next-themes";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -28,15 +27,12 @@ export default function RootLayout({
   return (
     <html
       lang="en"
-      suppressHydrationWarning
       className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
     >
-      <body className="min-h-full flex flex-col">
-        <ThemeProvider attribute="class" defaultTheme="light" enableSystem={false}>
-          <Preloader />
-          <TechHUD />
-          {children}
-        </ThemeProvider>
+      <body className="min-h-full flex flex-col bg-[#0a0a0a] text-white">
+        <Preloader />
+        <TechHUD />
+        {children}
       </body>
     </html>
   );

@@ -1,109 +1,44 @@
 "use client";
 
 import { Canvas, useThree, useFrame } from "@react-three/fiber";
-import { PerspectiveCamera, Environment, Stars, Float, Text } from "@react-three/drei";
-import { EffectComposer, Noise, Vignette, Bloom } from "@react-three/postprocessing";
+import { PerspectiveCamera, Environment, Stars } from "@react-three/drei";
+import { EffectComposer, Noise, Vignette } from "@react-three/postprocessing";
 import { Suspense, useMemo, useRef } from "react";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { useGSAP } from "@gsap/react";
-import { useTheme } from "next-themes";
 import Particles from "./Particles";
 import ProfileFrame from "./ProfileFrame";
 import * as THREE from "three";
 
 gsap.registerPlugin(ScrollTrigger);
 
-function CodeMonoliths() {
-  const { theme } = useTheme();
-  const monoliths = useMemo(() => {
-    const symbols = ["{ }", "[ ]", "< >", "//", "=>", "++"];
-    return Array.from({ length: 8 }).map((_, i) => ({
-      position: [
-        (Math.random() - 0.5) * 30,
-        (Math.random() - 0.5) * 15,
-        (Math.random() - 0.5) * 15,
-      ] as [number, number, number],
-      text: symbols[Math.floor(Math.random() * symbols.length)],
-      speed: 0.1 + Math.random() * 0.1,
-    }));
-  }, []);
-
-  const groupRef = useRef<THREE.Group>(null!);
-
-  useFrame((state) => {
-    if (!groupRef.current) return;
-    const scrollY = window.scrollY;
-    groupRef.current.position.y = THREE.MathUtils.lerp(groupRef.current.position.y, scrollY * 0.004, 0.05);
-  });
-
-  return (
-    <group ref={groupRef}>
-      {monoliths.map((item, i) => (
-        <group key={i} position={item.position}>
-          <Float speed={item.speed * 5} rotationIntensity={0.5} floatIntensity={0.5}>
-            <Text
-              fontSize={0.2}
-              color={theme === "dark" ? "#22d3ee" : "#0891b2"}
-              fillOpacity={theme === "dark" ? 0.04 : 0.15}
-            >
-              {item.text}
-            </Text>
-          </Float>
-        </group>
-      ))}
-    </group>
-  );
-}
-
-function ScanningBeam() {
-  const { theme } = useTheme();
-  const beamRef = useRef<THREE.Mesh>(null!);
-
-  useFrame((state) => {
-    if (!beamRef.current) return;
-    const t = state.clock.getElapsedTime();
-    beamRef.current.position.y = Math.sin(t * 0.3) * 12;
-    beamRef.current.rotation.x = Math.PI / 2;
-  });
-
-  return (
-    <mesh ref={beamRef}>
-      <planeGeometry args={[100, 0.2]} />
-      <meshBasicMaterial 
-        color={theme === "dark" ? "#22d3ee" : "#0891b2"} 
-        transparent 
-        opacity={theme === "dark" ? 0.03 : 0.08} 
-        side={THREE.DoubleSide}
-        blending={THREE.AdditiveBlending}
-      />
-    </mesh>
-  );
-}
-
 function LivingGrid() {
-  const { theme } = useTheme();
+  const { viewport } = useThree();
   const gridRef = useRef<THREE.GridHelper>(null!);
+  
+  const isMobile = viewport.width < 10;
+  // To make grids "smaller", we increase divisions relative to the size
+  const gridSize = isMobile ? 60 : 120;
+  const divisions = isMobile ? 80 : 60; // More divisions on smaller size = much smaller squares
 
   useFrame((state) => {
     if (!gridRef.current) return;
     const scrollY = window.scrollY;
-    gridRef.current.position.z = (scrollY * 0.01) % 2;
+    const squareSize = gridSize / divisions; 
+    gridRef.current.position.z = (scrollY * 0.04) % squareSize;
   });
-
-  const colors = theme === "dark" 
-    ? { main: 0x22d3ee, section: 0x111111, opacity: 0.08 }
-    : { main: 0x0891b2, section: 0xcccccc, opacity: 0.15 };
 
   return (
     <gridHelper 
+      key={isMobile ? 'mobile-grid' : 'desktop-grid'} 
       ref={gridRef}
-      args={[120, 40, colors.main, colors.section]} 
+      args={[gridSize, divisions, 0x22d3ee, 0x22d3ee]} 
       position={[0, -10, 0]} 
       onUpdate={(self) => {
         if (self.material instanceof THREE.Material) {
           self.material.transparent = true;
-          self.material.opacity = colors.opacity;
+          self.material.opacity = isMobile ? 0.1 : 0.15;
         }
       }}
     />
@@ -111,33 +46,35 @@ function LivingGrid() {
 }
 
 function SceneEffects() {
-  const { theme } = useTheme();
-  const { camera } = useThree();
+  const { viewport } = useThree();
   const starsRef = useRef<THREE.Group>(null!);
+  const isMobile = viewport.width < 10;
+
+  const fogColor = "#0a0a0a";
 
   useFrame((state) => {
+    const { camera } = state;
     const scrollY = window.scrollY;
     const maxScroll = document.documentElement.scrollHeight - window.innerHeight;
     const scrollPercent = scrollY / (maxScroll || 1);
 
-    camera.rotation.x = THREE.MathUtils.lerp(camera.rotation.x, -scrollPercent * 0.3, 0.03);
-    camera.position.y = THREE.MathUtils.lerp(camera.position.y, -scrollPercent * 6, 0.03);
+    camera.rotation.x = THREE.MathUtils.lerp(camera.rotation.x, -0.15 - (scrollPercent * 0.2), 0.03);
+    
+    const targetY = isMobile ? -scrollPercent * 3 : -scrollPercent * 4;
+    camera.position.y = THREE.MathUtils.lerp(camera.position.y, targetY, 0.03);
 
     if (starsRef.current) {
-      starsRef.current.position.y = scrollY * 0.001;
       starsRef.current.rotation.y += 0.0001;
-      // Fade out stars in light mode
-      starsRef.current.visible = theme === "dark";
     }
   });
 
   return (
     <>
-      <fog attach="fog" args={[theme === "dark" ? "#0a0a0a" : "#f8fafc", 15, 35]} />
+      <color attach="background" args={[fogColor]} />
+      <fog attach="fog" args={[fogColor, 10, isMobile ? 30 : 45]} />
       <LivingGrid />
-      <ScanningBeam />
       <group ref={starsRef}>
-        <Stars radius={150} depth={50} count={600} factor={1.5} saturation={0} fade speed={0.5} />
+        <Stars radius={150} depth={50} count={isMobile ? 300 : 600} factor={1.5} saturation={0} fade speed={0.5} />
       </group>
     </>
   );
@@ -150,11 +87,12 @@ function ResponsiveFrame() {
   const isMobile = viewport.width < 10;
   
   const initialPosition: [number, number, number] = useMemo(() => {
-    if (isMobile) return [0, 2, 0];
-    return [-viewport.width / 4, 0, 0];
+    // Corrected placement for mobile and desktop
+    if (isMobile) return [0, 0.4, 0]; // Lowered from 1.2 for mobile
+    return [-viewport.width / 4, -1.2, 0]; // Lowered from -0.5 for desktop
   }, [isMobile, viewport.width]);
 
-  const initialScale = isMobile ? 0.7 : 1;
+  const initialScale = isMobile ? 0.55 : 1;
 
   useGSAP(() => {
     if (!groupRef.current) return;
@@ -170,7 +108,7 @@ function ResponsiveFrame() {
         trigger: "#hero",
         start: "top top",
         end: "bottom top",
-        scrub: 1.5,
+        scrub: 1,
       }
     });
 
@@ -182,34 +120,34 @@ function ResponsiveFrame() {
   }, [initialPosition]);
 
   return (
-    <group ref={groupRef} position={initialPosition} scale={[initialScale, initialScale, initialScale]}>
+    <group 
+      ref={groupRef} 
+      position={initialPosition} 
+      scale={[initialScale, initialScale, initialScale]}
+    >
       <ProfileFrame />
-      <pointLight position={[0, 0, 2]} intensity={2} color="#ffffff" />
+      <pointLight position={[0, 0, 2]} intensity={2.5} color="#ffffff" />
     </group>
   );
 }
 
 export default function CanvasContainer() {
-  const { theme } = useTheme();
-
   return (
-    <div className="fixed inset-0 -z-10 bg-background transition-colors duration-1000">
+    <div className="fixed inset-0 -z-10">
       <Canvas shadows dpr={[1, 2]} gl={{ antialias: true }}>
         <PerspectiveCamera makeDefault position={[0, 0, 10]} fov={50} />
-        <ambientLight intensity={theme === "dark" ? 0.5 : 0.8} />
-        <pointLight position={[10, 10, 10]} intensity={1} color={theme === "dark" ? "#22d3ee" : "#ffffff"} />
+        <ambientLight intensity={0.5} />
+        <pointLight position={[10, 10, 10]} intensity={1} color="#22d3ee" />
         
         <Suspense fallback={null}>
           <SceneEffects />
-          <Particles count={80} />
-          <CodeMonoliths />
+          <Particles count={60} />
           <ResponsiveFrame />
-          <Environment preset={theme === "dark" ? "city" : "apartment"} />
+          <Environment preset="city" />
           
           <EffectComposer>
-            <Bloom luminanceThreshold={1} intensity={theme === "dark" ? 0.5 : 0.2} mipmapBlur />
-            <Noise opacity={theme === "dark" ? 0.015 : 0.005} />
-            <Vignette eskil={false} offset={0.1} darkness={theme === "dark" ? 0.8 : 0.4} />
+            <Noise opacity={0.015} />
+            <Vignette eskil={false} offset={0.1} darkness={0.8} />
           </EffectComposer>
         </Suspense>
       </Canvas>

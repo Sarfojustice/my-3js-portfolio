@@ -29,7 +29,7 @@ export default function ProfileFrame() {
         {/* Clean Image */}
         <mesh scale={[3, 4, 1]}>
           <planeGeometry />
-          <meshBasicMaterial map={texture} transparent opacity={1} />
+          <meshBasicMaterial map={texture} toneMapped={false} side={THREE.DoubleSide} />
         </mesh>
 
         {/* Minimalist Tech Border */}

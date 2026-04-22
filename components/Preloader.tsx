@@ -10,7 +10,7 @@ function LoadingMesh() {
   const meshRef = useRef<THREE.Mesh>(null!);
   
   useFrame((state) => {
-    const t = state.clock.getElapsedTime();
+    const t = state.clock.elapsedTime;
     meshRef.current.rotation.x = t * 0.5;
     meshRef.current.rotation.y = t * 0.2;
     meshRef.current.scale.setScalar(Math.sin(t * 2) * 0.1 + 1);
