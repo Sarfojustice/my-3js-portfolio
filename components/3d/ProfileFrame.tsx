@@ -7,44 +7,35 @@ import * as THREE from "three";
 
 export default function ProfileFrame() {
   const meshRef = useRef<THREE.Group>(null!);
-  
-  // Use manual texture loading for more control and stability
   const texture = useLoader(THREE.TextureLoader, "/profile.jpg");
 
   useFrame((state) => {
     if (!meshRef.current) return;
     const { x, y } = state.mouse;
-    meshRef.current.rotation.y = THREE.MathUtils.lerp(
-      meshRef.current.rotation.y,
-      x * 0.15,
-      0.05
-    );
-    meshRef.current.rotation.x = THREE.MathUtils.lerp(
-      meshRef.current.rotation.x,
-      -y * 0.15,
-      0.05
-    );
+    
+    meshRef.current.rotation.y = THREE.MathUtils.lerp(meshRef.current.rotation.y, x * 0.15, 0.05);
+    meshRef.current.rotation.x = THREE.MathUtils.lerp(meshRef.current.rotation.x, -y * 0.15, 0.05);
   });
 
   return (
-    <Float speed={1} rotationIntensity={0.1} floatIntensity={0.3}>
+    <Float speed={2} rotationIntensity={0.2} floatIntensity={0.5}>
       <group ref={meshRef}>
-        {/* Subtle Background Glow */}
+        {/* Glow backdrop */}
         <mesh position={[0, 0, -0.05]}>
-          <planeGeometry args={[3.05, 4.05]} />
-          <meshBasicMaterial color="#ffffff" transparent opacity={0.03} />
+          <planeGeometry args={[3.2, 4.2]} />
+          <meshBasicMaterial color="#22d3ee" transparent opacity={0.03} />
         </mesh>
         
-        {/* Your Actual Profile Image as a Mesh */}
+        {/* Clean Image */}
         <mesh scale={[3, 4, 1]}>
           <planeGeometry />
           <meshBasicMaterial map={texture} transparent opacity={1} />
         </mesh>
 
-        {/* Minimalist Border */}
+        {/* Minimalist Tech Border */}
         <lineSegments>
           <edgesGeometry args={[new THREE.PlaneGeometry(3, 4)]} />
-          <lineBasicMaterial color="#ffffff" transparent opacity={0.15} />
+          <lineBasicMaterial color="#22d3ee" transparent opacity={0.2} />
         </lineSegments>
       </group>
     </Float>

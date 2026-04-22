@@ -1,24 +1,80 @@
 "use client";
 
-import { useRef } from "react";
+import { useRef, useState, useEffect } from "react";
 import gsap from "gsap";
 import { useGSAP } from "@gsap/react";
 import { CV_DATA } from "@/data/cv";
 
+function DataReadout() {
+  const [data, setData] = useState("");
+  
+  useEffect(() => {
+    const interval = setInterval(() => {
+      const strings = ["LOAD_CORE", "MEM_SYNC", "NET_ACTIVE", "VOID_INIT", "SRC_MAP"];
+      setData(strings[Math.floor(Math.random() * strings.length)]);
+    }, 2000);
+    return () => clearInterval(interval);
+  }, []);
+
+  return (
+    <div className="flex items-center gap-2">
+      <div className="w-1.5 h-1.5 rounded-full bg-cyan-500 animate-pulse" />
+      <span className="text-[8px] font-mono text-cyan-500 tracking-[0.2em] uppercase">{data}</span>
+    </div>
+  );
+}
+
 export default function Hero() {
   const containerRef = useRef<HTMLDivElement>(null);
-  const textRef = useRef<HTMLDivElement>(null);
+  const nameRef = useRef<HTMLHeadingElement>(null);
 
   useGSAP(() => {
     const tl = gsap.timeline();
     
-    tl.from(textRef.current?.children || [], {
-      y: 50, // Reduced from 100
+    const scrambleText = (el: HTMLElement, finalResult: string) => {
+      const chars = "!<>-_\\/[]{}—=+*^?#________";
+      let iteration = 0;
+      const interval = setInterval(() => {
+        el.innerText = finalResult
+          .split("")
+          .map((letter, index) => {
+            if (index < iteration) return finalResult[index];
+            return chars[Math.floor(Math.random() * chars.length)];
+          })
+          .join("");
+
+        if (iteration >= finalResult.length) clearInterval(interval);
+        iteration += 1 / 3;
+      }, 30);
+    };
+
+    tl.from(".reveal-text", {
+      y: 30,
       opacity: 0,
-      duration: 1.5, // Slower
-      stagger: 0.1, // Reduced stagger
-      ease: "power2.out"
+      duration: 1.2,
+      stagger: 0.15,
+      ease: "power3.out",
+      onStart: () => {
+        if (nameRef.current) {
+          const first = CV_DATA.name.split(" ")[0];
+          scrambleText(nameRef.current.querySelector(".name-first")!, first);
+        }
+      }
     });
+
+    tl.from(".reveal-btn", {
+      y: 10,
+      opacity: 0,
+      duration: 0.8,
+      stagger: 0.1,
+      ease: "power2.out"
+    }, "-=0.8");
+
+    tl.from(".cyber-line", {
+      scaleX: 0,
+      duration: 1.5,
+      ease: "power4.inOut"
+    }, 0);
   }, { scope: containerRef });
 
   return (
@@ -27,32 +83,46 @@ export default function Hero() {
       id="hero"
       className="relative min-h-screen flex flex-col md:flex-row items-end md:items-center justify-center gap-12 px-6 py-24 overflow-hidden"
     >
-      {/* 3D Frame Container Space (Height for mobile) */}
+      {/* Decorative Cyber Grid Background Element */}
+      <div className="absolute top-1/2 left-0 w-full h-px bg-white/5 cyber-line origin-left" />
+      
       <div className="w-full md:w-1/2 h-[350px] md:h-[600px] flex items-center justify-center pointer-events-none">
         <div className="w-full h-full" />
       </div>
 
-      {/* Hero Text */}
-      <div ref={textRef} className="w-full md:w-1/2 text-center md:text-left z-20 mix-blend-difference pb-12 md:pb-0">
-        <h2 className="text-gray-400 text-sm font-mono mb-4 tracking-[0.3em] uppercase">
-          Full Stack Engineer
-        </h2>
-        <h1 className="text-white text-6xl md:text-8xl font-bold mb-6 leading-tight tracking-tighter">
-          {CV_DATA.name.split(" ")[0]} <br />
-          <span className="text-gray-500 italic">
+      <div className="w-full md:w-1/2 text-center md:text-left z-20 mix-blend-difference pb-12 md:pb-0 relative">
+        {/* Tech Decor */}
+        <div className="absolute -top-12 -left-8 hidden lg:block">
+          <DataReadout />
+          <div className="w-px h-12 bg-gradient-to-b from-cyan-500/50 to-transparent mt-2 ml-0.5" />
+        </div>
+
+        <div className="relative inline-block px-4 py-2 mb-6">
+          <div className="absolute top-0 left-0 w-2 h-2 border-t border-l border-cyan-500/50" />
+          <div className="absolute bottom-0 right-0 w-2 h-2 border-b border-r border-cyan-500/50" />
+          <h2 className="reveal-text text-gray-500 text-[10px] font-mono tracking-[0.5em] uppercase">
+            Full Stack Engineer // 01
+          </h2>
+        </div>
+
+        <h1 ref={nameRef} className="reveal-text text-white text-7xl md:text-9xl font-bold mb-8 leading-[0.9] tracking-tighter">
+          <span className="name-first">{CV_DATA.name.split(" ")[0]}</span> <br />
+          <span className="text-white/20 italic font-light">
             {CV_DATA.name.split(" ").slice(1).join(" ")}
           </span>
         </h1>
-        <p className="text-gray-300 text-lg md:text-xl max-w-xl mb-10 leading-relaxed font-light">
+        
+        <p className="reveal-text text-gray-400 text-lg md:text-xl max-w-lg mb-12 leading-relaxed font-light tracking-tight border-l border-white/5 pl-6">
           {CV_DATA.about}
         </p>
         
-        <div className="flex flex-wrap gap-4 justify-center md:justify-start">
-          <button className="px-8 py-4 bg-white text-black text-sm font-bold rounded-none transition-all duration-300 hover:bg-gray-200">
-            VIEW EXPERIENCE
+        <div className="flex flex-wrap gap-6 justify-center md:justify-start">
+          <button className="reveal-btn group relative px-8 py-4 bg-white text-black text-[10px] font-bold tracking-[0.2em] uppercase transition-all duration-300 hover:bg-cyan-500 hover:text-white overflow-hidden">
+            <span className="relative z-10">Access_Experience</span>
+            <div className="absolute inset-0 bg-cyan-500 translate-y-full group-hover:translate-y-0 transition-transform duration-300" />
           </button>
-          <button className="px-8 py-4 border border-white/20 text-white text-sm font-bold rounded-none transition-all duration-300 hover:border-white">
-            CONTACT ME
+          <button className="reveal-btn group relative px-8 py-4 border border-white/10 text-white text-[10px] font-bold tracking-[0.2em] uppercase transition-all duration-300 hover:border-white">
+            Establish_Contact
           </button>
         </div>
       </div>

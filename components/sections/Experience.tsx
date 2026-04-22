@@ -16,59 +16,69 @@ export default function Experience() {
     itemsRef.current.forEach((item, index) => {
       if (!item) return;
       
-      gsap.from(item, {
+      const content = item.querySelector(".experience-content");
+      const line = item.querySelector(".experience-line");
+
+      const tl = gsap.timeline({
         scrollTrigger: {
           trigger: item,
-          start: "top 90%", // Trigger slightly later
+          start: "top 85%",
           toggleActions: "play none none reverse",
-        },
-        y: 30, // Move up instead of sideways
-        opacity: 0,
-        duration: 1.2,
-        ease: "power2.out",
+        }
       });
+
+      tl.from(line, {
+        scaleY: 0,
+        transformOrigin: "top",
+        duration: 1,
+        ease: "power3.out",
+      })
+      .from(content, {
+        y: 40,
+        rotateX: -15,
+        opacity: 0,
+        duration: 0.8,
+        ease: "power2.out",
+      }, "-=0.6");
     });
   }, { scope: sectionRef });
 
   return (
-    <section ref={sectionRef} id="experience" className="py-24 px-6 max-w-6xl mx-auto relative z-10">
-      <h2 className="text-4xl md:text-6xl font-bold mb-16 text-center tracking-tighter">
-        Professional <span className="text-gray-500 italic font-light">Experience</span>
-      </h2>
+    <section ref={sectionRef} id="experience" className="py-32 px-6 max-w-6xl mx-auto relative z-10">
+      <div className="mb-24">
+        <h2 className="text-sm font-mono tracking-[0.3em] uppercase text-gray-500 mb-4">
+          History
+        </h2>
+        <p className="text-4xl md:text-6xl font-bold tracking-tighter">
+          Professional <span className="text-white/30 italic font-light">Experience</span>
+        </p>
+      </div>
 
-      <div className="space-y-12 relative">
-        {/* Central Line */}
-        <div className="absolute left-1/2 top-0 bottom-0 w-px bg-white/5 hidden md:block" />
-
+      <div className="space-y-24 relative" style={{ perspective: "1000px" }}>
         {CV_DATA.experience.map((exp, index) => (
           <div 
             key={index}
             ref={(el) => { itemsRef.current[index] = el; }}
-            className={`flex flex-col md:flex-row items-center gap-8 ${
-              index % 2 === 0 ? "md:flex-row-reverse" : ""
-            }`}
+            className="group relative pl-8 md:pl-12"
           >
-            {/* Timeline Circle */}
-            <div className="absolute left-1/2 transform -translate-x-1/2 w-2 h-2 rounded-full bg-white/20 border border-white/10 hidden md:block" />
-
-            {/* Content Card */}
-            <div className="w-full md:w-[45%] p-8 bg-white/[0.02] border border-white/5 backdrop-blur-sm hover:border-white/20 transition-colors duration-500">
-              <span className="text-gray-500 font-mono text-xs tracking-widest uppercase">{exp.period}</span>
-              <h3 className="text-xl font-bold mt-2 text-white">{exp.role}</h3>
-              <p className="text-gray-400 text-sm mb-4 font-light">{exp.company}</p>
+            <div className="experience-line absolute left-0 top-0 bottom-0 w-px bg-white/10 group-hover:bg-cyan-500 transition-colors duration-500" />
+            
+            <div className="experience-content">
+              <div className="flex flex-col md:flex-row md:items-baseline justify-between mb-4">
+                <h3 className="text-2xl font-bold text-white tracking-tight">{exp.role}</h3>
+                <span className="text-xs font-mono text-gray-500 tracking-widest uppercase">{exp.period}</span>
+              </div>
               
-              <ul className="space-y-3">
+              <p className="text-cyan-500 font-mono text-xs uppercase tracking-widest mb-6">{exp.company}</p>
+              
+              <ul className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 {exp.highlights.map((highlight, hIndex) => (
-                  <li key={hIndex} className="text-gray-400 text-xs flex items-start gap-3 leading-relaxed">
-                    <span className="mt-1.5 w-1 h-1 bg-white/30 rounded-full shrink-0" />
+                  <li key={hIndex} className="text-gray-400 text-sm leading-relaxed border-l border-white/5 pl-4 hover:border-white/20 transition-colors">
                     {highlight}
                   </li>
                 ))}
               </ul>
             </div>
-            
-            {/* Spacer */}
-            <div className="hidden md:block w-[45%]" />
           </div>
         ))}
       </div>

@@ -4,64 +4,106 @@ import { useRef, useMemo } from "react";
 import { useFrame } from "@react-three/fiber";
 import * as THREE from "three";
 
-export default function Particles({ count = 5000 }) {
-  const mesh = useRef<THREE.Points>(null!);
+export default function Particles({ count = 200 }) { // Reduced count for cleaner plexus look
+  const pointsRef = useRef<THREE.Points>(null!);
+  const linesRef = useRef<THREE.LineSegments>(null!);
 
   const particles = useMemo(() => {
     const positions = new Float32Array(count * 3);
-    const colors = new Float32Array(count * 3);
+    const velocities = new Float32Array(count * 3);
 
     for (let i = 0; i < count; i++) {
-      // Position
-      // eslint-disable-next-line react-hooks/purity
-      positions[i * 3 + 0] = (Math.random() - 0.5) * 40;
-      // eslint-disable-next-line react-hooks/purity
-      positions[i * 3 + 1] = (Math.random() - 0.5) * 40;
-      // eslint-disable-next-line react-hooks/purity
-      positions[i * 3 + 2] = (Math.random() - 0.5) * 40;
-
-      // Subtle Monochromatic Colors (White to Light Grey)
-      // eslint-disable-next-line react-hooks/purity
-      const grey = Math.random() * 0.4 + 0.6;
-      colors[i * 3 + 0] = grey;
-      colors[i * 3 + 1] = grey;
-      colors[i * 3 + 2] = grey;
+      positions[i * 3 + 0] = (Math.random() - 0.5) * 20;
+      positions[i * 3 + 1] = (Math.random() - 0.5) * 20;
+      positions[i * 3 + 2] = (Math.random() - 0.5) * 20;
+      
+      velocities[i * 3 + 0] = (Math.random() - 0.5) * 0.02;
+      velocities[i * 3 + 1] = (Math.random() - 0.5) * 0.02;
+      velocities[i * 3 + 2] = (Math.random() - 0.5) * 0.02;
     }
 
-    return { positions, colors };
+    return { positions, velocities };
   }, [count]);
 
   useFrame((state) => {
-    if (!mesh.current) return;
-    const time = state.clock.elapsedTime;
-    mesh.current.rotation.y = time * 0.02; // Slower rotation
-    mesh.current.rotation.x = time * 0.01; // Slower rotation
+    const posArr = pointsRef.current.geometry.attributes.position.array as Float32Array;
+    const linePosArr = linesRef.current.geometry.attributes.position.array as Float32Array;
+    let lineIdx = 0;
+
+    // Update positions
+    for (let i = 0; i < count; i++) {
+      posArr[i * 3 + 0] += particles.velocities[i * 3 + 0];
+      posArr[i * 3 + 1] += particles.velocities[i * 3 + 1];
+      posArr[i * 3 + 2] += particles.velocities[i * 3 + 2];
+
+      // Boundary check
+      if (Math.abs(posArr[i * 3 + 0]) > 10) particles.velocities[i * 3 + 0] *= -1;
+      if (Math.abs(posArr[i * 3 + 1]) > 10) particles.velocities[i * 3 + 1] *= -1;
+      if (Math.abs(posArr[i * 3 + 2]) > 10) particles.velocities[i * 3 + 2] *= -1;
+    }
+
+    // Update lines (Plexus)
+    for (let i = 0; i < count; i++) {
+      for (let j = i + 1; j < count; j++) {
+        const dx = posArr[i * 3 + 0] - posArr[j * 3 + 0];
+        const dy = posArr[i * 3 + 1] - posArr[j * 3 + 1];
+        const dz = posArr[i * 3 + 2] - posArr[j * 3 + 2];
+        const dist = Math.sqrt(dx * dx + dy * dy + dz * dz);
+
+        if (dist < 3 && lineIdx < linePosArr.length - 6) {
+          linePosArr[lineIdx++] = posArr[i * 3 + 0];
+          linePosArr[lineIdx++] = posArr[i * 3 + 1];
+          linePosArr[lineIdx++] = posArr[i * 3 + 2];
+          linePosArr[lineIdx++] = posArr[j * 3 + 0];
+          linePosArr[lineIdx++] = posArr[j * 3 + 1];
+          linePosArr[lineIdx++] = posArr[j * 3 + 2];
+        }
+      }
+    }
+
+    // Fill the rest with the last point to "hide" unused line segments
+    for (let i = lineIdx; i < linePosArr.length; i++) {
+      linePosArr[i] = posArr[0];
+    }
+
+    pointsRef.current.geometry.attributes.position.needsUpdate = true;
+    linesRef.current.geometry.attributes.position.needsUpdate = true;
+    
+    // Subtle overall rotation
+    pointsRef.current.rotation.y += 0.001;
+    linesRef.current.rotation.y += 0.001;
   });
 
   return (
-    <points ref={mesh}>
-      <bufferGeometry>
-        <bufferAttribute
-          attach="attributes-position"
-          count={particles.positions.length / 3}
-          array={particles.positions}
-          itemSize={3}
+    <group>
+      <points ref={pointsRef}>
+        <bufferGeometry>
+          <bufferAttribute
+            attach="attributes-position"
+            count={count}
+            array={particles.positions}
+            itemSize={3}
+          />
+        </bufferGeometry>
+        <pointsMaterial
+          size={0.06}
+          color="#22d3ee"
+          transparent
+          opacity={0.4}
+          sizeAttenuation
         />
-        <bufferAttribute
-          attach="attributes-color"
-          count={particles.colors.length / 3}
-          array={particles.colors}
-          itemSize={3}
-        />
-      </bufferGeometry>
-      <pointsMaterial
-        size={0.05}
-        vertexColors
-        transparent
-        opacity={0.6}
-        sizeAttenuation
-        blending={THREE.AdditiveBlending}
-      />
-    </points>
+      </points>
+      <lineSegments ref={linesRef}>
+        <bufferGeometry>
+          <bufferAttribute
+            attach="attributes-position"
+            count={count * 10} // Allocate enough space for lines
+            array={new Float32Array(count * 10 * 3)}
+            itemSize={3}
+          />
+        </bufferGeometry>
+        <lineBasicMaterial color="#22d3ee" transparent opacity={0.05} />
+      </lineSegments>
+    </group>
   );
 }
