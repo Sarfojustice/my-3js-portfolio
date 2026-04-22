@@ -13,46 +13,46 @@ const LinkedinIcon = ({ className }: { className?: string }) => (
 
 export default function Contact() {
   return (
-    <footer id="contact" className="py-24 px-6 max-w-4xl mx-auto relative z-10 text-center">
-      <h2 className="text-4xl md:text-6xl font-bold mb-8 tracking-tighter">
+    <footer id="contact" className="py-20 md:py-24 px-6 max-w-4xl mx-auto relative z-10 text-center">
+      <h2 className="text-4xl md:text-6xl font-bold mb-6 md:mb-8 tracking-tighter">
         Get In <span className="text-gray-500 font-light italic">Touch</span>
       </h2>
-      <p className="text-gray-500 text-lg mb-12 max-w-xl mx-auto leading-relaxed font-light">
+      <p className="text-gray-500 text-base md:text-lg mb-10 md:mb-12 max-w-xl mx-auto leading-relaxed font-light">
         I&apos;m always open to discussing new projects, creative ideas or opportunities to be part of your visions.
       </p>
 
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-16">
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-3 md:gap-4 mb-16">
         <a 
           href={`mailto:${CV_DATA.contact.email}`}
-          className="flex flex-col items-center gap-4 p-8 bg-white/[0.02] border border-white/5 hover:border-white/20 transition-all duration-500 group"
+          className="flex flex-col items-center gap-3 md:gap-4 p-6 md:p-8 bg-white/[0.02] border border-white/5 hover:border-white/20 transition-all duration-500 group"
         >
-          <Mail className="w-6 h-6 text-gray-400 group-hover:text-white transition-colors" />
-          <span className="text-[10px] font-mono tracking-widest uppercase text-gray-500">Email</span>
+          <Mail className="w-5 h-5 md:w-6 md:h-6 text-gray-400 group-hover:text-white transition-colors" />
+          <span className="text-[8px] md:text-[10px] font-mono tracking-widest uppercase text-gray-500">Email</span>
         </a>
         <a 
           href={CV_DATA.contact.github}
           target="_blank"
           rel="noopener noreferrer"
-          className="flex flex-col items-center gap-4 p-8 bg-white/[0.02] border border-white/5 hover:border-white/20 transition-all duration-500 group"
+          className="flex flex-col items-center gap-3 md:gap-4 p-6 md:p-8 bg-white/[0.02] border border-white/5 hover:border-white/20 transition-all duration-500 group"
         >
-          <GithubIcon className="w-6 h-6 text-gray-400 group-hover:text-white transition-colors" />
-          <span className="text-[10px] font-mono tracking-widest uppercase text-gray-500">GitHub</span>
+          <GithubIcon className="w-5 h-5 md:w-6 md:h-6 text-gray-400 group-hover:text-white transition-colors" />
+          <span className="text-[8px] md:text-[10px] font-mono tracking-widest uppercase text-gray-500">GitHub</span>
         </a>
         <a 
           href={CV_DATA.contact.linkedin}
           target="_blank"
           rel="noopener noreferrer"
-          className="flex flex-col items-center gap-4 p-8 bg-white/[0.02] border border-white/5 hover:border-white/20 transition-all duration-500 group"
+          className="flex flex-col items-center gap-3 md:gap-4 p-6 md:p-8 bg-white/[0.02] border border-white/5 hover:border-white/20 transition-all duration-500 group"
         >
-          <LinkedinIcon className="w-6 h-6 text-gray-400 group-hover:text-white transition-colors" />
-          <span className="text-[10px] font-mono tracking-widest uppercase text-gray-500">LinkedIn</span>
+          <LinkedinIcon className="w-5 h-5 md:w-6 md:h-6 text-gray-400 group-hover:text-white transition-colors" />
+          <span className="text-[8px] md:text-[10px] font-mono tracking-widest uppercase text-gray-500">LinkedIn</span>
         </a>
         <a 
           href={`tel:${CV_DATA.contact.phone}`}
-          className="flex flex-col items-center gap-4 p-8 bg-white/[0.02] border border-white/5 hover:border-white/20 transition-all duration-500 group"
+          className="flex flex-col items-center gap-3 md:gap-4 p-6 md:p-8 bg-white/[0.02] border border-white/5 hover:border-white/20 transition-all duration-500 group"
         >
-          <Phone className="w-6 h-6 text-gray-400 group-hover:text-white transition-colors" />
-          <span className="text-[10px] font-mono tracking-widest uppercase text-gray-500">Phone</span>
+          <Phone className="w-5 h-5 md:w-6 md:h-6 text-gray-400 group-hover:text-white transition-colors" />
+          <span className="text-[8px] md:text-[10px] font-mono tracking-widest uppercase text-gray-500">Phone</span>
         </a>
       </div>
 

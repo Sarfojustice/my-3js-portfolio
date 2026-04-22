@@ -24,15 +24,15 @@ export default function Certifications() {
   }, { scope: sectionRef });
 
   return (
-    <section ref={sectionRef} id="certifications" className="py-24 px-6 max-w-4xl mx-auto relative z-10">
-      <h2 className="text-4xl md:text-6xl font-bold mb-16 text-center tracking-tighter">
+    <section ref={sectionRef} id="certifications" className="py-20 md:py-24 px-6 max-w-4xl mx-auto relative z-10">
+      <h2 className="text-4xl md:text-6xl font-bold mb-12 md:mb-16 text-center tracking-tighter">
         Specialized <span className="text-gray-500 font-light italic">Certifications</span>
       </h2>
 
       {CV_DATA.certifications.map((cert, index) => (
         <div 
           key={index} 
-          className="cert-card p-10 bg-white/[0.02] border border-white/5 backdrop-blur-sm relative overflow-hidden group hover:border-white/20 transition-all duration-500"
+          className="cert-card p-6 md:p-10 bg-white/[0.02] border border-white/5 backdrop-blur-sm relative overflow-hidden group hover:border-white/20 transition-all duration-500"
         >
           {/* Decorative background icon */}
           <Award className="absolute -right-12 -bottom-12 w-64 h-64 text-white/[0.02] rotate-12 group-hover:rotate-0 transition-transform duration-1000" />

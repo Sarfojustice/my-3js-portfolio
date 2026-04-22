@@ -7,6 +7,9 @@ export default function TechHUD() {
   const containerRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
+    const isTouchDevice = window.matchMedia("(pointer: coarse)").matches;
+    if (isTouchDevice) return;
+
     const onMouseMove = (e: MouseEvent) => {
       const { clientX, clientY } = e;
       const xPos = (clientX / window.innerWidth - 0.5) * 20;
@@ -25,12 +28,12 @@ export default function TechHUD() {
   }, []);
 
   return (
-    <div ref={containerRef} className="fixed inset-0 pointer-events-none z-[5] overflow-hidden opacity-20">
+    <div ref={containerRef} className="fixed inset-0 pointer-events-none z-[5] overflow-hidden opacity-20 hidden md:block">
       {/* Corner Brackets */}
-      <div className="hud-element absolute top-12 left-12 w-8 h-8 border-t border-l border-white" />
-      <div className="hud-element absolute top-12 right-12 w-8 h-8 border-t border-r border-white" />
-      <div className="hud-element absolute bottom-12 left-12 w-8 h-8 border-b border-l border-white" />
-      <div className="hud-element absolute bottom-12 right-12 w-8 h-8 border-b border-r border-white" />
+      <div className="hud-element absolute top-6 left-6 md:top-12 md:left-12 w-6 h-6 md:w-8 md:h-8 border-t border-l border-white" />
+      <div className="hud-element absolute top-6 right-6 md:top-12 md:right-12 w-6 h-6 md:w-8 md:h-8 border-t border-r border-white" />
+      <div className="hud-element absolute bottom-6 left-6 md:bottom-12 md:left-12 w-6 h-6 md:w-8 md:h-8 border-b border-l border-white" />
+      <div className="hud-element absolute bottom-6 right-6 md:bottom-12 md:right-12 w-6 h-6 md:w-8 md:h-8 border-b border-r border-white" />
 
       {/* Floating Crosshairs */}
       <div className="hud-element absolute top-1/4 left-1/4 w-4 h-4">

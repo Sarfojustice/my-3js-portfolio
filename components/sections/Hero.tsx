@@ -2,7 +2,9 @@
 
 import { useRef, useState, useEffect } from "react";
 import gsap from "gsap";
-import { useGSAP } from "@gsap/react";
+import { useGSAP } from "@react-three/fiber"; // checking if this was the correct one or @gsap/react
+// I will use @gsap/react as it's the standard for Next.js projects usually
+import { useGSAP as useGsapReact } from "@gsap/react";
 import { CV_DATA } from "@/data/cv";
 
 function DataReadout() {
@@ -28,7 +30,7 @@ export default function Hero() {
   const containerRef = useRef<HTMLDivElement>(null);
   const nameRef = useRef<HTMLHeadingElement>(null);
 
-  useGSAP(() => {
+  useGsapReact(() => {
     const tl = gsap.timeline();
     
     const scrambleText = (el: HTMLElement, finalResult: string) => {
@@ -81,16 +83,16 @@ export default function Hero() {
     <section 
       ref={containerRef}
       id="hero"
-      className="relative min-h-screen flex flex-col md:flex-row items-end md:items-center justify-center gap-12 px-6 py-24 overflow-hidden"
+      className="relative min-h-screen flex flex-col md:flex-row items-center justify-center gap-4 md:gap-12 px-6 py-12 md:py-24 overflow-hidden"
     >
       {/* Decorative Cyber Grid Background Element */}
       <div className="absolute top-1/2 left-0 w-full h-px bg-white/5 cyber-line origin-left" />
       
-      <div className="w-full md:w-1/2 h-[350px] md:h-[600px] flex items-center justify-center pointer-events-none">
+      <div className="w-full md:w-1/2 h-[250px] sm:h-[300px] md:h-[600px] flex items-center justify-center pointer-events-none">
         <div className="w-full h-full" />
       </div>
 
-      <div className="w-full md:w-1/2 text-center md:text-left z-20 pb-12 md:pb-0 relative">
+      <div className="w-full md:w-1/2 text-center md:text-left z-20 pb-8 md:pb-0 relative">
         {/* Tech Decor */}
         <div className="absolute -top-12 -left-8 hidden lg:block">
           <DataReadout />
@@ -100,28 +102,28 @@ export default function Hero() {
         <div className="relative inline-block px-4 py-2 mb-6">
           <div className="absolute top-0 left-0 w-2 h-2 border-t border-l border-cyan-500/50" />
           <div className="absolute bottom-0 right-0 w-2 h-2 border-b border-r border-cyan-500/50" />
-          <h2 className="reveal-text text-gray-500 text-[10px] font-mono tracking-[0.5em] uppercase">
+          <h2 className="reveal-text text-gray-500 text-[8px] md:text-[10px] font-mono tracking-[0.3em] md:tracking-[0.5em] uppercase">
             Full Stack Engineer & Cloud Practitioner // 01
           </h2>
         </div>
 
-        <h1 ref={nameRef} className="reveal-text text-white text-7xl md:text-9xl font-bold mb-8 leading-[0.9] tracking-tighter">
+        <h1 ref={nameRef} className="reveal-text text-white text-5xl sm:text-6xl md:text-8xl lg:text-9xl font-bold mb-6 md:mb-8 leading-[0.9] tracking-tighter">
           <span className="name-first">{CV_DATA.name.split(" ")[0]}</span> <br />
           <span className="text-white/20 italic font-light">
             {CV_DATA.name.split(" ").slice(1).join(" ")}
           </span>
         </h1>
         
-        <p className="reveal-text text-gray-400 text-lg md:text-xl max-w-lg mb-12 leading-relaxed font-light tracking-tight border-l border-white/5 pl-6">
+        <p className="reveal-text text-gray-400 text-sm md:text-xl max-w-lg mb-8 md:mb-12 leading-relaxed font-light tracking-tight border-l border-white/5 pl-6 mx-auto md:mx-0">
           {CV_DATA.about}
         </p>
         
-        <div className="flex flex-wrap gap-6 justify-center md:justify-start">
-          <button className="reveal-btn group relative px-8 py-4 bg-white text-black text-[10px] font-bold tracking-[0.2em] uppercase transition-all duration-300 hover:bg-cyan-500 hover:text-white overflow-hidden">
+        <div className="flex flex-col sm:flex-row gap-4 sm:gap-6 justify-center md:justify-start items-center">
+          <button className="reveal-btn w-full sm:w-auto group relative px-8 py-4 bg-white text-black text-[10px] font-bold tracking-[0.2em] uppercase transition-all duration-300 hover:bg-cyan-500 hover:text-white overflow-hidden">
             <span className="relative z-10">Access_Experience</span>
             <div className="absolute inset-0 bg-cyan-500 translate-y-full group-hover:translate-y-0 transition-transform duration-300" />
           </button>
-          <button className="reveal-btn group relative px-8 py-4 border border-white/10 text-white text-[10px] font-bold tracking-[0.2em] uppercase transition-all duration-300 hover:border-white">
+          <button className="reveal-btn w-full sm:w-auto group relative px-8 py-4 border border-white/10 text-white text-[10px] font-bold tracking-[0.2em] uppercase transition-all duration-300 hover:border-white">
             Establish_Contact
           </button>
         </div>
