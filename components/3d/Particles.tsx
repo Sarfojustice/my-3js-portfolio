@@ -2,9 +2,11 @@
 
 import { useRef, useMemo } from "react";
 import { useFrame } from "@react-three/fiber";
+import { useTheme } from "next-themes";
 import * as THREE from "three";
 
-export default function Particles({ count = 200 }) { // Reduced count for cleaner plexus look
+export default function Particles({ count = 200 }) {
+  const { theme } = useTheme();
   const pointsRef = useRef<THREE.Points>(null!);
   const linesRef = useRef<THREE.LineSegments>(null!);
 
@@ -28,23 +30,22 @@ export default function Particles({ count = 200 }) { // Reduced count for cleane
   const linePositions = useMemo(() => new Float32Array(count * 10 * 3), [count]);
 
   useFrame((state) => {
+    if (!pointsRef.current || !linesRef.current) return;
+    
     const posArr = pointsRef.current.geometry.attributes.position.array as Float32Array;
     const linePosArr = linesRef.current.geometry.attributes.position.array as Float32Array;
     let lineIdx = 0;
 
-    // Update positions
     for (let i = 0; i < count; i++) {
       posArr[i * 3 + 0] += particles.velocities[i * 3 + 0];
       posArr[i * 3 + 1] += particles.velocities[i * 3 + 1];
       posArr[i * 3 + 2] += particles.velocities[i * 3 + 2];
 
-      // Boundary check
       if (Math.abs(posArr[i * 3 + 0]) > 10) particles.velocities[i * 3 + 0] *= -1;
       if (Math.abs(posArr[i * 3 + 1]) > 10) particles.velocities[i * 3 + 1] *= -1;
       if (Math.abs(posArr[i * 3 + 2]) > 10) particles.velocities[i * 3 + 2] *= -1;
     }
 
-    // Update lines (Plexus)
     for (let i = 0; i < count; i++) {
       for (let j = i + 1; j < count; j++) {
         const dx = posArr[i * 3 + 0] - posArr[j * 3 + 0];
@@ -63,18 +64,17 @@ export default function Particles({ count = 200 }) { // Reduced count for cleane
       }
     }
 
-    // Fill the rest with the last point to "hide" unused line segments
     for (let i = lineIdx; i < linePosArr.length; i++) {
       linePosArr[i] = posArr[0];
     }
 
     pointsRef.current.geometry.attributes.position.needsUpdate = true;
     linesRef.current.geometry.attributes.position.needsUpdate = true;
-    
-    // Subtle overall rotation
     pointsRef.current.rotation.y += 0.001;
     linesRef.current.rotation.y += 0.001;
   });
+
+  const particleColor = theme === "dark" ? "#22d3ee" : "#0891b2";
 
   return (
     <group>
@@ -87,9 +87,9 @@ export default function Particles({ count = 200 }) { // Reduced count for cleane
         </bufferGeometry>
         <pointsMaterial
           size={0.06}
-          color="#22d3ee"
+          color={particleColor}
           transparent
-          opacity={0.4}
+          opacity={theme === "dark" ? 0.4 : 0.6}
           sizeAttenuation
         />
       </points>
@@ -100,7 +100,11 @@ export default function Particles({ count = 200 }) { // Reduced count for cleane
             args={[linePositions, 3]}
           />
         </bufferGeometry>
-        <lineBasicMaterial color="#22d3ee" transparent opacity={0.05} />
+        <lineBasicMaterial 
+          color={particleColor} 
+          transparent 
+          opacity={theme === "dark" ? 0.05 : 0.1} 
+        />
       </lineSegments>
     </group>
   );

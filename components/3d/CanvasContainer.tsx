@@ -7,6 +7,7 @@ import { Suspense, useMemo, useRef } from "react";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { useGSAP } from "@gsap/react";
+import { useTheme } from "next-themes";
 import Particles from "./Particles";
 import ProfileFrame from "./ProfileFrame";
 import * as THREE from "three";
@@ -14,6 +15,7 @@ import * as THREE from "three";
 gsap.registerPlugin(ScrollTrigger);
 
 function CodeMonoliths() {
+  const { theme } = useTheme();
   const monoliths = useMemo(() => {
     const symbols = ["{ }", "[ ]", "< >", "//", "=>", "++"];
     return Array.from({ length: 8 }).map((_, i) => ({
@@ -42,8 +44,8 @@ function CodeMonoliths() {
           <Float speed={item.speed * 5} rotationIntensity={0.5} floatIntensity={0.5}>
             <Text
               fontSize={0.2}
-              color="#22d3ee"
-              fillOpacity={0.04}
+              color={theme === "dark" ? "#22d3ee" : "#0891b2"}
+              fillOpacity={theme === "dark" ? 0.04 : 0.15}
             >
               {item.text}
             </Text>
@@ -55,6 +57,7 @@ function CodeMonoliths() {
 }
 
 function ScanningBeam() {
+  const { theme } = useTheme();
   const beamRef = useRef<THREE.Mesh>(null!);
 
   useFrame((state) => {
@@ -68,9 +71,9 @@ function ScanningBeam() {
     <mesh ref={beamRef}>
       <planeGeometry args={[100, 0.2]} />
       <meshBasicMaterial 
-        color="#22d3ee" 
+        color={theme === "dark" ? "#22d3ee" : "#0891b2"} 
         transparent 
-        opacity={0.03} 
+        opacity={theme === "dark" ? 0.03 : 0.08} 
         side={THREE.DoubleSide}
         blending={THREE.AdditiveBlending}
       />
@@ -79,6 +82,7 @@ function ScanningBeam() {
 }
 
 function LivingGrid() {
+  const { theme } = useTheme();
   const gridRef = useRef<THREE.GridHelper>(null!);
 
   useFrame((state) => {
@@ -87,15 +91,19 @@ function LivingGrid() {
     gridRef.current.position.z = (scrollY * 0.01) % 2;
   });
 
+  const colors = theme === "dark" 
+    ? { main: 0x22d3ee, section: 0x111111, opacity: 0.08 }
+    : { main: 0x0891b2, section: 0xcccccc, opacity: 0.15 };
+
   return (
     <gridHelper 
       ref={gridRef}
-      args={[120, 40, 0x22d3ee, 0x0a0a0a]} 
+      args={[120, 40, colors.main, colors.section]} 
       position={[0, -10, 0]} 
       onUpdate={(self) => {
         if (self.material instanceof THREE.Material) {
           self.material.transparent = true;
-          self.material.opacity = 0.08;
+          self.material.opacity = colors.opacity;
         }
       }}
     />
@@ -103,6 +111,7 @@ function LivingGrid() {
 }
 
 function SceneEffects() {
+  const { theme } = useTheme();
   const { camera } = useThree();
   const starsRef = useRef<THREE.Group>(null!);
 
@@ -117,12 +126,14 @@ function SceneEffects() {
     if (starsRef.current) {
       starsRef.current.position.y = scrollY * 0.001;
       starsRef.current.rotation.y += 0.0001;
+      // Fade out stars in light mode
+      starsRef.current.visible = theme === "dark";
     }
   });
 
   return (
     <>
-      <fog attach="fog" args={["#0a0a0a", 15, 30]} />
+      <fog attach="fog" args={[theme === "dark" ? "#0a0a0a" : "#f8fafc", 15, 35]} />
       <LivingGrid />
       <ScanningBeam />
       <group ref={starsRef}>
@@ -179,24 +190,26 @@ function ResponsiveFrame() {
 }
 
 export default function CanvasContainer() {
+  const { theme } = useTheme();
+
   return (
-    <div className="fixed inset-0 -z-10 bg-[#0a0a0a]">
+    <div className="fixed inset-0 -z-10 bg-background transition-colors duration-1000">
       <Canvas shadows dpr={[1, 2]} gl={{ antialias: true }}>
         <PerspectiveCamera makeDefault position={[0, 0, 10]} fov={50} />
-        <ambientLight intensity={0.5} />
-        <pointLight position={[10, 10, 10]} intensity={1} color="#22d3ee" />
+        <ambientLight intensity={theme === "dark" ? 0.5 : 0.8} />
+        <pointLight position={[10, 10, 10]} intensity={1} color={theme === "dark" ? "#22d3ee" : "#ffffff"} />
         
         <Suspense fallback={null}>
           <SceneEffects />
           <Particles count={80} />
           <CodeMonoliths />
           <ResponsiveFrame />
-          <Environment preset="city" />
+          <Environment preset={theme === "dark" ? "city" : "apartment"} />
           
           <EffectComposer>
-            <Bloom luminanceThreshold={1} intensity={0.5} mipmapBlur />
-            <Noise opacity={0.015} />
-            <Vignette eskil={false} offset={0.1} darkness={0.8} />
+            <Bloom luminanceThreshold={1} intensity={theme === "dark" ? 0.5 : 0.2} mipmapBlur />
+            <Noise opacity={theme === "dark" ? 0.015 : 0.005} />
+            <Vignette eskil={false} offset={0.1} darkness={theme === "dark" ? 0.8 : 0.4} />
           </EffectComposer>
         </Suspense>
       </Canvas>
