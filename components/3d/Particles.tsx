@@ -25,6 +25,8 @@ export default function Particles({ count = 200 }) { // Reduced count for cleane
     return { positions, velocities };
   }, [count]);
 
+  const linePositions = useMemo(() => new Float32Array(count * 10 * 3), [count]);
+
   useFrame((state) => {
     const posArr = pointsRef.current.geometry.attributes.position.array as Float32Array;
     const linePosArr = linesRef.current.geometry.attributes.position.array as Float32Array;
@@ -80,9 +82,7 @@ export default function Particles({ count = 200 }) { // Reduced count for cleane
         <bufferGeometry>
           <bufferAttribute
             attach="attributes-position"
-            count={count}
-            array={particles.positions}
-            itemSize={3}
+            args={[particles.positions, 3]}
           />
         </bufferGeometry>
         <pointsMaterial
@@ -97,9 +97,7 @@ export default function Particles({ count = 200 }) { // Reduced count for cleane
         <bufferGeometry>
           <bufferAttribute
             attach="attributes-position"
-            count={count * 10} // Allocate enough space for lines
-            array={new Float32Array(count * 10 * 3)}
-            itemSize={3}
+            args={[linePositions, 3]}
           />
         </bufferGeometry>
         <lineBasicMaterial color="#22d3ee" transparent opacity={0.05} />

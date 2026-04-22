@@ -14,17 +14,30 @@ export default function Experience() {
   const itemsRef = useRef<(HTMLDivElement | null)[]>([]);
 
   useGSAP(() => {
+    // Header Animation - Reveal earlier
+    gsap.from(".experience-header", {
+      scrollTrigger: {
+        trigger: ".experience-header",
+        start: "top 95%",
+        toggleActions: "play none none reverse",
+      },
+      y: 30,
+      opacity: 0,
+      duration: 1,
+      ease: "power3.out"
+    });
+
     itemsRef.current.forEach((item, index) => {
       if (!item) return;
       
       const content = item.querySelector(".experience-content");
       const line = item.querySelector(".experience-line");
 
-      // Entrance Animation
+      // Entrance Animation - Trigger earlier (92% instead of 85%)
       const tl = gsap.timeline({
         scrollTrigger: {
           trigger: item,
-          start: "top 85%",
+          start: "top 92%",
           toggleActions: "play none none reverse",
         }
       });
@@ -84,7 +97,7 @@ export default function Experience() {
 
   return (
     <section ref={sectionRef} id="experience" className="py-32 px-6 max-w-6xl mx-auto relative z-20">
-      <div className="mb-24">
+      <div className="mb-24 experience-header">
         <h2 className="text-sm font-mono tracking-[0.5em] uppercase text-cyan-500/50 mb-4">
           // Data_Stream
         </h2>
