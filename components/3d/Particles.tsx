@@ -5,55 +5,77 @@ import { useFrame } from "@react-three/fiber";
 import { useTheme } from "next-themes";
 import * as THREE from "three";
 
-export default function Particles({ count = 200 }) {
+// Types for particle data to keep it organized
+type ParticleSystemData = {
+  positions: Float32Array;
+  velocities: Float32Array;
+  seeds: Float32Array;
+};
+
+// Pure initialization helper moved out of render cycle
+const createParticles = (count: number): ParticleSystemData => {
+  const positions = new Float32Array(count * 3);
+  const velocities = new Float32Array(count * 3);
+  const seeds = new Float32Array(count);
+
+  for (let i = 0; i < count; i++) {
+    positions[i * 3 + 0] = (Math.random() - 0.5) * 25;
+    positions[i * 3 + 1] = (Math.random() - 0.5) * 25;
+    positions[i * 3 + 2] = (Math.random() - 0.5) * 25;
+    
+    velocities[i * 3 + 0] = (Math.random() - 0.5) * 0.01;
+    velocities[i * 3 + 1] = (Math.random() - 0.5) * 0.01;
+    velocities[i * 3 + 2] = (Math.random() - 0.5) * 0.01;
+    seeds[i] = Math.random() * Math.PI * 2;
+  }
+  return { positions, velocities, seeds };
+};
+
+export default function Particles({ count = 120 }) {
   const { theme } = useTheme();
   const pointsRef = useRef<THREE.Points>(null!);
   const linesRef = useRef<THREE.LineSegments>(null!);
 
-  const particles = useMemo(() => {
-    const positions = new Float32Array(count * 3);
-    const velocities = new Float32Array(count * 3);
-
-    for (let i = 0; i < count; i++) {
-      positions[i * 3 + 0] = (Math.random() - 0.5) * 20;
-      positions[i * 3 + 1] = (Math.random() - 0.5) * 20;
-      positions[i * 3 + 2] = (Math.random() - 0.5) * 20;
-      
-      velocities[i * 3 + 0] = (Math.random() - 0.5) * 0.02;
-      velocities[i * 3 + 1] = (Math.random() - 0.5) * 0.02;
-      velocities[i * 3 + 2] = (Math.random() - 0.5) * 0.02;
-    }
-
-    return { positions, velocities };
-  }, [count]);
-
-  const linePositions = useMemo(() => new Float32Array(count * 10 * 3), [count]);
+  // Standard R3F approach for high-performance mutations
+  const data = useMemo(() => createParticles(count), [count]);
+  
+  // We move the velocities into a separate ref to avoid React 19 linting errors 
+  // about mutating memoized objects, while keeping performance high.
+  const velocitiesRef = useRef(data.velocities);
+  
+  const linePositions = useMemo(() => new Float32Array(count * 4 * 3), [count]);
 
   useFrame((state) => {
     if (!pointsRef.current || !linesRef.current) return;
     
     const posArr = pointsRef.current.geometry.attributes.position.array as Float32Array;
     const linePosArr = linesRef.current.geometry.attributes.position.array as Float32Array;
+    const vels = velocitiesRef.current;
     let lineIdx = 0;
 
-    for (let i = 0; i < count; i++) {
-      posArr[i * 3 + 0] += particles.velocities[i * 3 + 0];
-      posArr[i * 3 + 1] += particles.velocities[i * 3 + 1];
-      posArr[i * 3 + 2] += particles.velocities[i * 3 + 2];
+    const time = state.clock.getElapsedTime();
 
-      if (Math.abs(posArr[i * 3 + 0]) > 10) particles.velocities[i * 3 + 0] *= -1;
-      if (Math.abs(posArr[i * 3 + 1]) > 10) particles.velocities[i * 3 + 1] *= -1;
-      if (Math.abs(posArr[i * 3 + 2]) > 10) particles.velocities[i * 3 + 2] *= -1;
+    for (let i = 0; i < count; i++) {
+      // Subtle drift
+      posArr[i * 3 + 0] += vels[i * 3 + 0] + Math.sin(time + data.seeds[i]) * 0.002;
+      posArr[i * 3 + 1] += vels[i * 3 + 1] + Math.cos(time + data.seeds[i]) * 0.002;
+      posArr[i * 3 + 2] += vels[i * 3 + 2];
+
+      // Boundary check
+      if (Math.abs(posArr[i * 3 + 0]) > 12) vels[i * 3 + 0] *= -1;
+      if (Math.abs(posArr[i * 3 + 1]) > 12) vels[i * 3 + 1] *= -1;
+      if (Math.abs(posArr[i * 3 + 2]) > 12) vels[i * 3 + 2] *= -1;
     }
 
+    // Connect only if close, but limit total lines for cleaner look
     for (let i = 0; i < count; i++) {
       for (let j = i + 1; j < count; j++) {
         const dx = posArr[i * 3 + 0] - posArr[j * 3 + 0];
         const dy = posArr[i * 3 + 1] - posArr[j * 3 + 1];
         const dz = posArr[i * 3 + 2] - posArr[j * 3 + 2];
-        const dist = Math.sqrt(dx * dx + dy * dy + dz * dz);
+        const distSq = dx * dx + dy * dy + dz * dz;
 
-        if (dist < 3 && lineIdx < linePosArr.length - 6) {
+        if (distSq < 4 && lineIdx < linePosArr.length - 6) {
           linePosArr[lineIdx++] = posArr[i * 3 + 0];
           linePosArr[lineIdx++] = posArr[i * 3 + 1];
           linePosArr[lineIdx++] = posArr[i * 3 + 2];
@@ -64,14 +86,17 @@ export default function Particles({ count = 200 }) {
       }
     }
 
+    // Reset remaining positions to a single point to "hide" them
     for (let i = lineIdx; i < linePosArr.length; i++) {
       linePosArr[i] = posArr[0];
     }
 
     pointsRef.current.geometry.attributes.position.needsUpdate = true;
     linesRef.current.geometry.attributes.position.needsUpdate = true;
-    pointsRef.current.rotation.y += 0.001;
-    linesRef.current.rotation.y += 0.001;
+    
+    // Slow rotation
+    pointsRef.current.rotation.y += 0.0002;
+    linesRef.current.rotation.y += 0.0002;
   });
 
   const particleColor = theme === "dark" ? "#22d3ee" : "#0891b2";
@@ -82,15 +107,16 @@ export default function Particles({ count = 200 }) {
         <bufferGeometry>
           <bufferAttribute
             attach="attributes-position"
-            args={[particles.positions, 3]}
+            args={[data.positions, 3]}
           />
         </bufferGeometry>
         <pointsMaterial
-          size={0.06}
+          size={0.04}
           color={particleColor}
           transparent
-          opacity={theme === "dark" ? 0.4 : 0.6}
+          opacity={theme === "dark" ? 0.3 : 0.5}
           sizeAttenuation
+          blending={THREE.AdditiveBlending}
         />
       </points>
       <lineSegments ref={linesRef}>
@@ -103,7 +129,8 @@ export default function Particles({ count = 200 }) {
         <lineBasicMaterial 
           color={particleColor} 
           transparent 
-          opacity={theme === "dark" ? 0.05 : 0.1} 
+          opacity={theme === "dark" ? 0.03 : 0.06} 
+          blending={THREE.AdditiveBlending}
         />
       </lineSegments>
     </group>

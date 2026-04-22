@@ -90,7 +90,7 @@ export default function Hero() {
         <div className="w-full h-full" />
       </div>
 
-      <div className="w-full md:w-1/2 text-center md:text-left z-20 mix-blend-difference pb-12 md:pb-0 relative">
+      <div className="w-full md:w-1/2 text-center md:text-left z-20 pb-12 md:pb-0 relative">
         {/* Tech Decor */}
         <div className="absolute -top-12 -left-8 hidden lg:block">
           <DataReadout />

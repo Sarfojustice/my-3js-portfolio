@@ -10,13 +10,13 @@ export default function ScrollDistortion({ children }: { children: React.ReactNo
   const containerRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    let proxy = { skew: 0 };
-    let skewSetter = gsap.quickSetter(containerRef.current, "skewY", "deg");
-    let clamp = gsap.utils.clamp(-2, 2); // subtle skew
+    const proxy = { skew: 0 };
+    const skewSetter = gsap.quickSetter(containerRef.current, "skewY", "deg");
+    const clamp = gsap.utils.clamp(-2, 2); // subtle skew
 
     ScrollTrigger.create({
       onUpdate: (self) => {
-        let skew = clamp(self.getVelocity() / -500);
+        const skew = clamp(self.getVelocity() / -500);
         if (Math.abs(skew) > Math.abs(proxy.skew)) {
           proxy.skew = skew;
           gsap.to(proxy, {
