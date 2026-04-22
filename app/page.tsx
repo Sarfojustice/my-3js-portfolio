@@ -7,6 +7,7 @@ import Skills from "@/components/sections/Skills";
 import Certifications from "@/components/sections/Certifications";
 import Contact from "@/components/sections/Contact";
 import Navbar from "@/components/Navbar";
+import ScrollDistortion from "@/components/3d/ScrollDistortion";
 
 const CanvasContainer = dynamic(() => import("@/components/3d/CanvasContainer"), {
   ssr: false,
@@ -18,13 +19,15 @@ export default function Home() {
       <Navbar />
       <CanvasContainer />
       
-      <div className="relative z-10">
-        <Hero />
-        <Experience />
-        <Skills />
-        <Certifications />
-        <Contact />
-      </div>
+      <ScrollDistortion>
+        <div className="relative z-10 isolate">
+          <Hero />
+          <Experience />
+          <Skills />
+          <Certifications />
+          <Contact />
+        </div>
+      </ScrollDistortion>
     </main>
   );
 }
