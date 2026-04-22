@@ -69,7 +69,7 @@ export default function Preloader() {
 
       <div className="loading-ui z-10 text-center">
         <div className="text-[10px] font-mono tracking-[0.5em] text-cyan-500 mb-4 uppercase animate-pulse">
-          Initializing System
+          Initializing Portfolio
         </div>
         <div className="text-4xl md:text-6xl font-bold tracking-tighter text-white mb-2">
           {progress}%
@@ -81,7 +81,7 @@ export default function Preloader() {
           />
         </div>
         <div className="mt-4 text-[8px] font-mono text-gray-500 uppercase tracking-widest">
-          Allocating Core Modules...
+          Establishing Secure Connection...
         </div>
       </div>
     </div>

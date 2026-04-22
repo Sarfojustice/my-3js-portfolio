@@ -101,7 +101,7 @@ export default function Hero() {
           <div className="absolute top-0 left-0 w-2 h-2 border-t border-l border-cyan-500/50" />
           <div className="absolute bottom-0 right-0 w-2 h-2 border-b border-r border-cyan-500/50" />
           <h2 className="reveal-text text-gray-500 text-[10px] font-mono tracking-[0.5em] uppercase">
-            Full Stack Engineer // 01
+            Full Stack Engineer & Cloud Practitioner // 01
           </h2>
         </div>
 

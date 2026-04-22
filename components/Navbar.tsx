@@ -78,7 +78,7 @@ export default function Navbar() {
           </div>
           
           <button 
-            className="w-10 h-10 flex items-center justify-center border border-white/5 hover:border-cyan-500/40 transition-colors"
+            className="md:hidden w-10 h-10 flex items-center justify-center border border-white/5 hover:border-cyan-500/40 transition-colors"
             onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
           >
             {isMobileMenuOpen ? <X className="w-4 h-4" /> : <Menu className="w-4 h-4" />}

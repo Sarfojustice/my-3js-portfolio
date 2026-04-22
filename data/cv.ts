@@ -1,7 +1,7 @@
 export const CV_DATA = {
   name: "Justice Osei Sarfo",
-  role: "Full Stack Engineer & AI Specialist",
-  about: "A passionate Full Stack Engineer with expertise in building scalable web and mobile applications, specialized in React, Next.js, .NET, and Deep Learning for Computer Vision.",
+  role: "Full Stack Engineer & AWS Cloud Practitioner",
+  about: "A passionate Full Stack Engineer with expertise in building scalable web and mobile applications, specialized in React, Next.js, .NET, Cloud Computing, and Deep Learning for Computer Vision.",
   contact: {
     email: "sarfojustice96@gmail.com",
     github: "https://github.com/sarfojustice/",
@@ -28,6 +28,7 @@ export const CV_DATA = {
       role: "Full Stack Engineer (Co-founder)",
       period: "January 2025 - Present",
       location: "Accra, Ghana",
+      url: "https://selfvibe.io",
       highlights: [
         "Built and shipped core product features for Selfvibe.io using Next.js and ASP.Net Backend.",
         "Implemented scalable client state management with Zustand.",
@@ -42,6 +43,7 @@ export const CV_DATA = {
       role: "Full Stack Engineer",
       period: "November 2025 - January 2026",
       location: "Accra, Ghana",
+      url: "https://scentandskingh.com",
       highlights: [
         "Designed and built a full-featured e-commerce platform using Node.js, Next.js, and TypeScript.",
         "Engineered an advanced admin dashboard for product and inventory management.",
@@ -56,6 +58,7 @@ export const CV_DATA = {
       role: "Software Engineer (Intern)",
       period: "August 2025 - December 2025",
       location: "Accra, Ghana",
+      url: "https://traaple.com",
       highlights: [
         "Collaborated to build and improve mobile and web applications.",
         "Implemented experience booking flows with clean, intuitive interfaces.",
@@ -68,6 +71,7 @@ export const CV_DATA = {
       role: "Web developer (contract)",
       period: "November 2025 - January 2026",
       location: "Accra, Ghana",
+      url: "https://signaturespagh.com",
       highlights: [
         "Built a smooth, visually stunning spa website focused on showcasing services.",
         "Developed the frontend using Next.js, React, and TypeScript.",
@@ -91,6 +95,12 @@ export const CV_DATA = {
     }
   ],
   certifications: [
+    {
+      title: "AWS Certified Cloud Practitioner",
+      issuer: "Amazon Web Services",
+      date: "2024",
+      projects: ["Cloud Architecture", "Security & Compliance", "Cloud Economics"]
+    },
     {
       title: "Applied AI Lab: Deep Learning for Computer Vision",
       issuer: "WorldQuant University",
