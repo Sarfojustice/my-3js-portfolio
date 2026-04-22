@@ -5,7 +5,7 @@ export const CV_DATA = {
   contact: {
     email: "sarfojustice96@gmail.com",
     github: "https://github.com/sarfojustice/",
-    linkedin: "https://linkedin.com/in/justice-osei-sarfo", // Assuming standard LinkedIn URL structure
+    linkedin: "https://www.linkedin.com/in/justice-sarfo/",
     phone: "(+233)-59-936-7830",
   },
   education: [

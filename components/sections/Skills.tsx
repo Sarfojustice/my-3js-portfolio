@@ -10,35 +10,50 @@ gsap.registerPlugin(ScrollTrigger);
 
 export default function Skills() {
   const containerRef = useRef<HTMLDivElement>(null);
-  const cardRefs = useRef<(HTMLDivElement | null)[]>([]);
-
-  const categories = [
-    { title: "Languages", items: CV_DATA.skills.languages },
-    { title: "Web & Frameworks", items: CV_DATA.skills.web },
-    { title: "Databases", items: CV_DATA.skills.databases },
-    { title: "Cloud & DevOps", items: CV_DATA.skills.cloud },
-  ];
 
   useGSAP(() => {
+    // Header Animation
+    gsap.fromTo(".skills-header", 
+      { y: 40, opacity: 0 },
+      {
+        y: 0,
+        opacity: 1,
+        duration: 1,
+        ease: "power3.out",
+        scrollTrigger: {
+          trigger: ".skills-header",
+          start: "top 95%",
+          toggleActions: "play none none reverse",
+        }
+      }
+    );
+
     const isTouchDevice = window.matchMedia("(pointer: coarse)").matches;
 
-    cardRefs.current.forEach((card, index) => {
-      if (!card) return;
-
-      // Entrance - Assemble from scattered state
-      gsap.from(card, {
-        scrollTrigger: {
-          trigger: card,
-          start: "top 90%",
-          toggleActions: "play none none reverse",
+    // Cards Animation - Individual trigger for each card
+    const cards = gsap.utils.toArray(".skill-card");
+    cards.forEach((card: any) => {
+      gsap.fromTo(card,
+        { 
+          y: 80, 
+          opacity: 0,
+          rotateX: isTouchDevice ? 0 : -15,
+          z: isTouchDevice ? 0 : -500 
         },
-        x: index % 2 === 0 ? -100 : 100,
-        z: isTouchDevice ? 0 : -1000,
-        rotateY: isTouchDevice ? 0 : (index % 2 === 0 ? 45 : -45),
-        opacity: 0,
-        duration: 1.5,
-        ease: "expo.out",
-      });
+        {
+          y: 0,
+          opacity: 1,
+          rotateX: 0,
+          z: 0,
+          duration: 1.5,
+          ease: "expo.out",
+          scrollTrigger: {
+            trigger: card,
+            start: "top 92%",
+            toggleActions: "play none none reverse",
+          }
+        }
+      );
 
       if (!isTouchDevice) {
         // Hover interaction
@@ -48,9 +63,9 @@ export default function Skills() {
           const y = (e.clientY - rect.top) / rect.height - 0.5;
 
           gsap.to(card, {
-            rotateY: x * 30,
-            rotateX: -y * 30,
-            scale: 1.05,
+            rotateY: x * 20,
+            rotateX: -y * 20,
+            z: 20,
             duration: 0.5,
             ease: "power2.out",
           });
@@ -60,7 +75,7 @@ export default function Skills() {
           gsap.to(card, {
             rotateY: 0,
             rotateX: 0,
-            scale: 1,
+            z: 0,
             duration: 0.8,
             ease: "power2.out",
           });
@@ -73,45 +88,44 @@ export default function Skills() {
   }, { scope: containerRef });
 
   return (
-    <section ref={containerRef} id="skills" className="py-20 md:py-32 px-6 max-w-6xl mx-auto relative z-10" style={{ perspective: "2000px" }}>
-      <div className="mb-16 md:mb-24 text-center md:text-left">
-        <h2 className="text-xs font-mono tracking-[0.5em] uppercase text-cyan-500/50 mb-4">
-          // Core_Tech
+    <section ref={containerRef} id="skills" className="py-24 md:py-32 px-6 max-w-6xl mx-auto relative z-20" style={{ perspective: "2000px" }}>
+      <div className="mb-16 md:mb-24 text-center md:text-left skills-header">
+        <h2 className="text-[10px] font-mono tracking-[0.5em] uppercase text-cyan-500/50 mb-4">
+          // Core_Tech_Matrix
         </h2>
-        <p className="text-4xl sm:text-5xl md:text-7xl font-bold tracking-tighter text-white">
-          Skill <span className="text-white/10 font-light">Matrix</span>
+        <p className="text-5xl sm:text-6xl md:text-8xl font-bold tracking-tighter text-white leading-tight">
+          Skill <span className="text-white/10 font-light italic">Vault</span>
         </p>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-px bg-white/5 border border-white/5 overflow-visible">
-        {categories.map((cat, index) => (
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-8">
+        {Object.entries(CV_DATA.skills).map(([key, items], index) => (
           <div 
-            key={index} 
-            ref={(el) => { cardRefs.current[index] = el; }}
-            className="bg-[#0a0a0a] p-8 md:p-12 group transition-all duration-500 relative overflow-hidden"
+            key={key} 
+            className="skill-card bg-black/60 border border-white/10 backdrop-blur-xl p-8 md:p-14 group transition-all duration-700 relative overflow-hidden rounded-2xl shadow-2xl"
             style={{ transformStyle: "preserve-3d" }}
           >
             {/* Animated Scanning Line */}
-            <div className="absolute top-0 left-0 w-full h-px bg-cyan-500/20 -translate-y-full group-hover:animate-[scan_2s_linear_infinite]" />
+            <div className="absolute top-0 left-0 w-full h-[1px] bg-cyan-500/30 -translate-y-full group-hover:animate-[scan_3s_linear_infinite] opacity-0 group-hover:opacity-100" />
             
-            <h3 className="text-xs font-mono mb-8 text-cyan-500/40 tracking-[0.3em] uppercase group-hover:text-cyan-400 transition-colors" style={{ transform: "translateZ(40px)" }}>
-              {cat.title}
+            <h3 className="text-[10px] font-mono mb-10 text-cyan-500/40 tracking-[0.4em] uppercase group-hover:text-cyan-400 transition-colors" style={{ transform: "translateZ(30px)" }}>
+              {key.charAt(0).toUpperCase() + key.slice(1)}
             </h3>
             
-            <div className="flex flex-wrap gap-x-6 md:gap-x-8 gap-y-4 md:gap-y-6" style={{ transform: "translateZ(20px)" }}>
-              {cat.items.map((skill, sIndex) => (
+            <div className="flex flex-wrap gap-x-6 md:gap-x-12 gap-y-4 md:gap-y-8" style={{ transform: "translateZ(15px)" }}>
+              {items.map((skill, sIndex) => (
                 <div key={sIndex} className="relative group/skill">
-                  <span className="text-lg md:text-2xl text-white/30 group-hover/skill:text-white transition-all cursor-default font-light tracking-tight block">
+                  <span className="text-xl md:text-3xl text-white/20 group-hover/skill:text-white transition-all cursor-default font-light tracking-tighter block leading-none">
                     {skill}
                   </span>
-                  <div className="absolute -bottom-1 left-0 w-0 h-px bg-cyan-500/50 group-hover/skill:w-full transition-all duration-300" />
+                  <div className="absolute -bottom-2 left-0 w-0 h-px bg-cyan-500/50 group-hover/skill:w-full transition-all duration-300" />
                 </div>
               ))}
             </div>
 
             {/* Tech Decoration */}
-            <div className="absolute bottom-4 right-4 text-[8px] font-mono text-white/5 uppercase tracking-widest">
-              Sec_Unit_{index + 1}
+            <div className="absolute bottom-6 right-8 text-[7px] font-mono text-white/5 uppercase tracking-[0.3em]">
+              Node_Identifier_0{index + 1}
             </div>
           </div>
         ))}
@@ -120,7 +134,7 @@ export default function Skills() {
       <style jsx>{`
         @keyframes scan {
           0% { transform: translateY(-100%); }
-          100% { transform: translateY(1000%); }
+          100% { transform: translateY(1500%); }
         }
       `}</style>
     </section>
