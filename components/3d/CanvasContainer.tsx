@@ -34,7 +34,7 @@ function FloatingData() {
             position={item.position}
             fontSize={0.2}
             color="#22d3ee"
-            opacity={0.08}
+            fillOpacity={0.08}
             transparent
             depthWrite={false}
           >
